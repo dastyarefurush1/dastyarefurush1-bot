@@ -1,0 +1,39 @@
+import os
+import logging
+from telegram import Update
+from telegram.ext import Application, MessageHandler, filters, CallbackContext
+
+# تنظیمات لاگ
+logging.basicConfig(format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO)
+logger = logging.getLogger(name)
+
+# توکن ربات شما (از متغیر محیطی خوانده می‌شود)
+BOT_TOKEN = os.environ.get("BOT_TOKEN")
+
+async def handle_message(update: Update, context: CallbackContext):
+    user_message = update.message.text
+    chat_id = update.message.chat_id
+    
+    # پاسخ اولیه
+    response = f"سلام! پیام شما: '{user_message}' دریافت شد. :dart:\n\n"
+    response += "این ربات آمادهٔ توسعه و اضافه کردن قابلیت‌های جدید است!"
+    
+    await update.message.reply_text(response)
+
+def main():
+    if not BOT_TOKEN:
+        logger.error("لطفاً توکن ربات را در متغیر محیطی BOT_TOKEN تنظیم کنید.")
+        return
+    
+    # ساخت اپلیکیشن
+    application = Application.builder().token(BOT_TOKEN).build()
+    
+    # هندلر برای پیام‌های متنی
+    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
+    
+    # شروع ربات
+    application.run_polling()
+    print("ربات فعال شد!") 
+
+if name == "main":
+    main()
